@@ -1,0 +1,158 @@
+uint8_t CashCode_poll[] = { 0x02, 0x03, 0x06, 0x33, 0xDA, 0x81 };
+uint8_t CashCode_ack[] = { 0x02, 0x03, 0x06, 0x00, 0x0C2, 0x82 };
+uint8_t CashCode_reset[] = { 0x02, 0x03, 0x06, 0x30, 0x41, 0xB3 };
+uint8_t CashCode_initialized[] = { 0x02, 0x03, 0x06, 0x19, 0x82, 0x0F };
+//
+uint8_t CashCode_request[] = { 0x02, 0x03, 0x06, 0x37, 0xFE, 0xC7 };
+uint8_t CashCode_request_type[] = { 0x02, 0x03, 0x06, 0x41, 0x4F, 0xD1 };
+//
+uint8_t CashCode_request_reply[] = { 0x02, 0x03, 0x27, 0x56, 0x55, 0x2D, 0x55, 0x41, 0x31, 0x38, 0x33, 0x37, 0x41, 0x46, 0x20, 0x20, 0x20, 0x20, 0x30, 0x30, 0x4B, 0x35, 0x30, 0x35, 0x30, 0x32, 0x31, 0x38, 0x31, 0x31, 0x41, 0x10, 0x00, 0x00, 0x00, 0xC9, 0xFF, 0xBB, 0x46 };
+uint8_t CashCode_request_type_reply[] = { 0x02, 0x03, 0x7D, 0x05, 0x55, 0x4B, 0x52, 0x00, 0x01, 0x55, 0x4B, 0x52, 0x01, 0x02, 0x55, 0x4B, 0x52, 0x01, 0x05, 0x55, 0x4B, 0x52, 0x01, 0x01, 0x55, 0x4B, 0x52, 0x02, 0x02, 0x55, 0x4B, 0x52, 0x02, 0x05, 0x55, 0x4B, 0x52, 0x02, 0x01, 0x55, 0x4B, 0x52, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF9, 0xE7 };
+//uint8_t CashCode_enable[] = { 0x02, 0x03, 0x0C, 0x34, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xB5, 0xC1 };
+uint8_t CashCode_bill_type[] = { 0x02, 0x03, 0x06, 0x41, 0x4F, 0xD1 };
+uint8_t CashCode_idling[] = {0x02, 0x03, 0x06, 0x14, 0x67, 0xD4 };
+uint8_t CashCode_scan[] = {0x02, 0x03, 0x06, 0x15, 0xEE, 0xC5 };
+
+uint8_t CashCode_5uah[] = { 0x02, 0x03, 0x07, 0x81, 0x00, 0x54, 0x2A } ; // уложено
+
+//unsigned long timeInterval = 100;
+//unsigned long lastGetTime = 0;
+//uint32_t money_time = 0;
+
+boolean butt_flag = 0;
+boolean butt;
+
+void setup() {
+
+  pinMode(5, INPUT_PULLUP);
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+  Serial.begin(9600, SERIAL_8N1);
+
+}
+
+void loop() {
+
+delay(30);
+
+     uint8_t byte_data[6];
+
+    if (Serial.available()) {
+      byte_data[0] = Serial.read();
+      byte_data[1] = Serial.read();
+      byte_data[2] = Serial.read();
+
+      if ((byte_data[0] == 0x02) && (byte_data[1] == 0x03)) {
+        byte_data[3] = Serial.read();
+        byte_data[4] = Serial.read();
+        byte_data[5] = Serial.read();
+        
+        while (Serial.available()) {
+          Serial.read();
+        }
+
+        if (byte_data[3] == 0x37) {
+          Serial.write(CashCode_request_reply, sizeof(CashCode_request_reply));
+        } 
+
+        else if (byte_data[3] == 0x41) {
+          Serial.write(CashCode_request_type_reply, sizeof(CashCode_request_type_reply));
+          //digitalWrite(13,HIGH);
+          //delay(50);
+         //digitalWrite(13,LOW);
+        } 
+        
+        else if (byte_data[3] == 0x00) {
+          Serial.write(CashCode_ack, sizeof(CashCode_ack));
+        }
+
+        else if (byte_data[3] == 0x33) {
+          Serial.write(CashCode_initialized, sizeof(CashCode_initialized));
+       }
+
+        else if (byte_data[3] == 0x30) {
+          Serial.write(CashCode_initialized, sizeof(CashCode_initialized));
+        }
+
+        else if (byte_data[3] == 0x34) {
+          Serial.write(CashCode_idling, sizeof(CashCode_idling));
+
+              while (Serial.available()) {
+                Serial.read();
+                }
+           
+           byte_data[3] = 0x06;
+
+          while((byte_data[3] == !0x30) || (byte_data[3] == !0x38) || (byte_data[3] == !0x34) ){
+
+              if (Serial.available()) {
+                byte_data[0] = Serial.read();
+                byte_data[1] = Serial.read();
+                byte_data[2] = Serial.read();
+
+            if ((byte_data[0] == 0x02) && (byte_data[1] == 0x03)) {
+                byte_data[3] = Serial.read();
+                byte_data[4] = Serial.read();
+                byte_data[5] = Serial.read();
+
+                while (Serial.available()) {
+                Serial.read();
+                }
+              }
+            }
+          if ((byte_data[3] == !0x30) || (byte_data[3] == !0x38) || (byte_data[3] == !0x34)){
+           butt_flag = 0;
+          }
+         
+            while((butt == 0) && (butt_flag == 0)) {
+
+              butt = !digitalRead(5);
+
+            if (Serial.available()) {
+                byte_data[0] = Serial.read();
+                byte_data[1] = Serial.read();
+                byte_data[2] = Serial.read();
+
+            if ((byte_data[0] == 0x02) && (byte_data[1] == 0x03)) {
+                byte_data[3] = Serial.read();
+                byte_data[4] = Serial.read();
+                byte_data[5] = Serial.read();
+        
+            if ((byte_data[3] == 0x30) || (byte_data[3] == 0x38) || (byte_data[3] == 0x34)){
+                butt_flag = 1;
+                }
+
+                while (Serial.available()) {
+                Serial.read();
+                }
+
+                if (byte_data[3] == 0x00) {
+              Serial.write(CashCode_ack, sizeof(CashCode_ack));
+                  }
+
+                else if (byte_data[3] == 0x33) {
+              Serial.write(CashCode_idling, sizeof(CashCode_idling));
+                  }
+                }
+              if (butt_flag == 0) {
+              Serial.write(CashCode_5uah, (CashCode_5uah));
+              }
+             }  
+             butt = 0;
+             delay(500); 
+            } 
+           }
+
+          butt_flag = 0;
+          digitalWrite(13, LOW);
+          }
+          
+    else {
+     while (Serial.available()) {
+     Serial.read();
+        }
+      }
+
+}
+}
+}
