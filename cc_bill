@@ -135,7 +135,7 @@ delay(30);
                   }
                 }
               if (butt_flag == 0) {
-              Serial.write(CashCode_5uah, (CashCode_5uah));
+              Serial.write(CashCode_5uah, sizeof(CashCode_5uah));
               }
              }  
              butt = 0;
